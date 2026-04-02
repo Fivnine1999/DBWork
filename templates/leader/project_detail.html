@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.project_name }} - 项目详情{% endblock %}
+
+{% block header %}
+<div class="header">
+    <h1>项目详情</h1>
+    <div class="user-info">
+        <span>欢迎，{{ session.real_name }}</span>
+        <span class="status-badge status-{{ session.role }}">{{ session.role }}</span>
+        <a href="{{ url_for('logout') }}">退出登录</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <a href="{{ url_for('leader_dashboard') }}" class="btn btn-secondary">← 返回项目列表</a>
+</div>
+
+{% if project.status == '已驳回' %}
+<div style="background: #fff3cd; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #ffc107;">
+    <h3 style="margin-bottom: 15px; color: #856404;">修改项目信息并重新申请</h3>
+    <form method="POST" action="{{ url_for('update_project', project_id=project.project_id) }}">
+        <div class="form-group">
+            <label>项目名称</label>
+            <input type="text" name="project_name" value="{{ project.project_name }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label>项目简介</label>
+            <textarea name="description" rows="3" required>{{ project.description }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>项目预算</label>
+            <input type="number" name="budget" step="0.01" value="{{ project.budget }}" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">重新提交申报</button>
+    </form>
+</div>
+{% else %}
+<div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+    <h2 style="margin-bottom: 15px;">{{ project.project_name }}</h2>
+    <p><strong>项目简介：</strong>{{ project.description }}</p>
+    <p><strong>项目预算：</strong>¥{{ project.budget }}</p>
+    <p><strong>当前状态：</strong><span class="status-badge status-{{ project.status }}">{{ project.status }}</span></p>
+    <p><strong>申报日期：</strong>{{ project.apply_date }}</p>
+    {% if project.status == '执行中' %}
+    <div style="margin-top: 20px;">
+        <form method="POST" action="{{ url_for('request_complete', project_id=project.project_id) }}" style="display: inline;">
+            <button type="submit" class="btn btn-primary" onclick="return confirm('确定要结题该项目吗？结题后将无法再进行操作。')">结题</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if project.status == '执行中' or project.status == '已结题' %}
+<div class="tabs">
+    <div class="tab active" onclick="showTab('info', this)">项目信息</div>
+    <div class="tab" onclick="showTab('tasks', this)">任务管理</div>
+    <div class="tab" onclick="showTab('reimbursements', this)">报销审核</div>
+    <div class="tab" onclick="showTab('achievements', this)">成果审核</div>
+</div>
+
+<div id="info" class="tab-content active">
+    <h2>项目信息</h2>
+    
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h3 style="margin-bottom: 15px;">科研人员任务</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>科研人员</th>
+                    <th>部门</th>
+                    <th>任务列表</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for researcher in researchers_with_tasks %}
+                <tr>
+                    <td>{{ researcher.real_name }}</td>
+                    <td>{{ researcher.department }}</td>
+                    <td>
+                        <table style="width: 100%; margin: 0; border: none;">
+                            <thead>
+                                <tr style="background: #e9ecef;">
+                                    <th style="padding: 8px; text-align: left;">序号</th>
+                                    <th style="padding: 8px; text-align: left;">任务内容</th>
+                                    <th style="padding: 8px; text-align: left;">截止日期</th>
+                                    <th style="padding: 8px; text-align: left;">状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in researcher.tasks %}
+                                <tr>
+                                    <td style="padding: 8px;">{{ loop.index }}</td>
+                                    <td style="padding: 8px;">{{ task.task_content }}</td>
+                                    <td style="padding: 8px;">{{ task.deadline }}</td>
+                                    <td style="padding: 8px;"><span class="status-badge status-{{ task.status }}">{{ task.status }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="text-align: center; color: #999;">暂无科研人员任务</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h3 style="margin-bottom: 15px;">成果展示</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>提交人</th>
+                    <th>成果名称</th>
+                    <th>类型</th>
+                    <th>发表日期</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for achievement in achievements %}
+                <tr>
+                    <td>{{ achievement.submitter_name }}</td>
+                    <td>{{ achievement.title }}</td>
+                    <td>{{ achievement.type }}</td>
+                    <td>{{ achievement.publish_date }}</td>
+                    <td><span class="status-badge status-{{ achievement.status }}">{{ achievement.status }}</span></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #999;">暂无成果记录</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h3 style="margin-bottom: 15px;">报销情况</h3>
+        <div style="margin-bottom: 20px;">
+            <p><strong>项目预算：</strong>¥{{ project.budget }}</p>
+            <p><strong>已报销金额：</strong>¥{{ total_reimbursed }}</p>
+            <p><strong>报销进度：</strong>{{ "%.2f"|format(reimbursement_percentage) }}%</p>
+            <div style="background: #e9ecef; border-radius: 10px; height: 30px; overflow: hidden; margin-top: 10px;">
+                <div id="progress-bar" data-percentage="{{ reimbursement_percentage }}" style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>申请人</th>
+                    <th>金额</th>
+                    <th>事由</th>
+                    <th>申请日期</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reimb in reimbursements %}
+                <tr>
+                    <td>{{ reimb.applicant_name }}</td>
+                    <td>¥{{ reimb.amount }}</td>
+                    <td>{{ reimb.reason }}</td>
+                    <td>{{ reimb.apply_date }}</td>
+                    <td><span class="status-badge status-{{ reimb.status }}">{{ reimb.status }}</span></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #999;">暂无报销记录</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="tasks" class="tab-content">
+    <h2>任务管理</h2>
+    
+    {% if project.status == '执行中' %}
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h3 style="margin-bottom: 15px;">分配任务</h3>
+        <form method="POST" action="{{ url_for('assign_task') }}">
+            <input type="hidden" name="project_id" value="{{ project.project_id }}">
+            
+            <div class="form-group">
+                <label>科研人员</label>
+                <select name="researcher_id" required>
+                    <option value="">请选择科研人员</option>
+                    {% for researcher in researchers %}
+                    <option value="{{ researcher.user_id }}">{{ researcher.real_name }}（{{ researcher.department }}）</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>任务内容</label>
+                <textarea name="task_content" rows="3" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>截止日期</label>
+                <input type="date" name="deadline" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">分配任务</button>
+        </form>
+    </div>
+    {% endif %}
+    
+    <table>
+        <thead>
+            <tr>
+                <th>科研人员</th>
+                <th>任务内容</th>
+                <th>截止日期</th>
+                <th>状态</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>{{ task.researcher_name }}</td>
+                <td>{{ task.task_content }}</td>
+                <td>{{ task.deadline }}</td>
+                <td><span class="status-badge status-{{ task.status }}">{{ task.status }}</span></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" style="text-align: center; color: #999;">暂无任务</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="reimbursements" class="tab-content">
+    <h2>报销审核</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>申请人</th>
+                <th>金额</th>
+                <th>事由</th>
+                <th>申请日期</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reimb in reimbursements %}
+            <tr>
+                <td>{{ reimb.applicant_name }}</td>
+                <td>¥{{ reimb.amount }}</td>
+                <td>{{ reimb.reason }}</td>
+                <td>{{ reimb.apply_date }}</td>
+                <td><span class="status-badge status-{{ reimb.status }}">{{ reimb.status }}</span></td>
+                <td>
+                    {% if reimb.status == '待审核' and project.status == '执行中' %}
+                    <form method="POST" action="{{ url_for('review_reimbursement', reimb_id=reimb.reimb_id) }}" style="display: inline;">
+                        <input type="hidden" name="action" value="approve">
+                        <button type="submit" class="btn btn-success btn-small">通过</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('review_reimbursement', reimb_id=reimb.reimb_id) }}" style="display: inline;">
+                        <input type="hidden" name="action" value="reject">
+                        <button type="submit" class="btn btn-danger btn-small">驳回</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: #999;">暂无报销记录</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="achievements" class="tab-content">
+    <h2>成果审核</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>提交人</th>
+                <th>成果名称</th>
+                <th>类型</th>
+                <th>发表日期</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for achievement in achievements %}
+            <tr>
+                <td>{{ achievement.submitter_name }}</td>
+                <td>{{ achievement.title }}</td>
+                <td>{{ achievement.type }}</td>
+                <td>{{ achievement.publish_date }}</td>
+                <td><span class="status-badge status-{{ achievement.status }}">{{ achievement.status }}</span></td>
+                <td>
+                    {% if achievement.status == '待审核' and project.status == '执行中' %}
+                    <form method="POST" action="{{ url_for('review_achievement', achievement_id=achievement.achievement_id) }}" style="display: inline;">
+                        <input type="hidden" name="action" value="approve">
+                        <button type="submit" class="btn btn-success btn-small">通过</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('review_achievement', achievement_id=achievement.achievement_id) }}" style="display: inline;">
+                        <input type="hidden" name="action" value="reject">
+                        <button type="submit" class="btn btn-danger btn-small">驳回</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: #999;">暂无成果记录</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showTab(tabId, element) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    element.classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var progressBar = document.getElementById('progress-bar');
+    if (progressBar) {
+        var percentage = progressBar.getAttribute('data-percentage');
+        if (percentage) {
+            setTimeout(function() {
+                progressBar.style.width = percentage + '%';
+            }, 100);
+        }
+    }
+});
+</script>
+{% endblock %}

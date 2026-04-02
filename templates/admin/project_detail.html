@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}项目详情 - 科研项目管理系统{% endblock %}
+
+{% block header %}
+<div class="header">
+    <h1>项目详情</h1>
+    <div class="user-info">
+        <span>欢迎，{{ session.real_name }}</span>
+        <span class="status-badge status-{{ session.role }}">{{ session.role }}</span>
+        <a href="{{ url_for('admin_dashboard') }}">返回管理台</a>
+        <a href="{{ url_for('logout') }}">退出登录</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom: 30px;">
+    <h2>{{ project.project_name }}</h2>
+    <div class="grid" style="margin-top: 20px;">
+        <div>
+            <p><strong>项目描述：</strong>{{ project.description or '暂无描述' }}</p>
+            <p><strong>项目负责人：</strong>{{ project.leader_name }}</p>
+            <p><strong>申报日期：</strong>{{ project.apply_date }}</p>
+        </div>
+        <div>
+            <p><strong>项目预算：</strong>¥{{ project.budget }}</p>
+            <p><strong>已报销金额：</strong>¥{{ project.total_reimbursement or 0 }}</p>
+            <p><strong>报销进度：</strong>
+                {% if project.budget > 0 %}
+                {{ ((project.total_reimbursement or 0) / project.budget * 100)|round(2) }}%
+                {% else %}
+                0%
+                {% endif %}
+            </p>
+        </div>
+        <div>
+            <p><strong>项目状态：</strong><span class="status-badge status-{{ project.status }}">{{ project.status }}</span></p>
+            <p><strong>任务总数：</strong>{{ project.task_count }}</p>
+            <p><strong>已完成任务：</strong>{{ project.completed_task_count }}</p>
+        </div>
+        <div>
+            <p><strong>成果总数：</strong>{{ project.achievement_count }}</p>
+            <p><strong>已通过成果：</strong>{{ project.approved_achievement_count }}</p>
+            <p><strong>报销申请数：</strong>{{ project.reimbursement_count }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="tabs">
+    <div class="tab active" onclick="showTab('tasks')">任务列表</div>
+    <div class="tab" onclick="showTab('reimbursements')">报销记录</div>
+    <div class="tab" onclick="showTab('achievements')">成果列表</div>
+    <div class="tab" onclick="showTab('researchers')">团队人员</div>
+</div>
+
+<div id="tasks" class="tab-content active">
+    <h2>任务列表</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>任务ID</th>
+                <th>科研人员</th>
+                <th>任务内容</th>
+                <th>截止日期</th>
+                <th>状态</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>{{ task.task_id }}</td>
+                <td>{{ task.researcher_name }}</td>
+                <td>{{ task.task_content }}</td>
+                <td>{{ task.deadline or '未设置' }}</td>
+                <td><span class="status-badge status-{{ task.status }}">{{ task.status }}</span></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: #999;">暂无任务</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="reimbursements" class="tab-content">
+    <h2>报销记录</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>报销单号</th>
+                <th>申请人</th>
+                <th>金额</th>
+                <th>事由</th>
+                <th>申请日期</th>
+                <th>状态</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reimb in reimbursements %}
+            <tr>
+                <td>{{ reimb.reimb_id }}</td>
+                <td>{{ reimb.applicant_name }}</td>
+                <td>¥{{ reimb.amount }}</td>
+                <td>{{ reimb.reason }}</td>
+                <td>{{ reimb.apply_date }}</td>
+                <td><span class="status-badge status-{{ reimb.status }}">{{ reimb.status }}</span></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: #999;">暂无报销记录</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="achievements" class="tab-content">
+    <h2>成果列表</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>成果ID</th>
+                <th>提交人</th>
+                <th>成果名称</th>
+                <th>类型</th>
+                <th>发表日期</th>
+                <th>状态</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for achievement in achievements %}
+            <tr>
+                <td>{{ achievement.achievement_id }}</td>
+                <td>{{ achievement.submitter_name }}</td>
+                <td>{{ achievement.title }}</td>
+                <td>{{ achievement.type }}</td>
+                <td>{{ achievement.publish_date or '未设置' }}</td>
+                <td><span class="status-badge status-{{ achievement.status }}">{{ achievement.status }}</span></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: #999;">暂无成果</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="researchers" class="tab-content">
+    <h2>团队人员</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>用户ID</th>
+                <th>姓名</th>
+                <th>部门</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for researcher in researchers %}
+            <tr>
+                <td>{{ researcher.user_id }}</td>
+                <td>{{ researcher.real_name }}</td>
+                <td>{{ researcher.department }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" style="text-align: center; color: #999;">暂无团队成员</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showTab(tabId) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    event.target.classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+}
+</script>
+{% endblock %}
