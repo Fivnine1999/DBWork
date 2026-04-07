@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}科研项目管理系统{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
     <style>
         * {
             margin: 0;
@@ -383,6 +384,16 @@
             color: white;
             text-decoration: none;
         }
+        
+        .btn-export svg {
+            width: 14px !important;
+            height: 14px !important;
+            min-width: 14px !important;
+            min-height: 14px !important;
+            flex-shrink: 0 !important;
+            margin-right: 0 !important;
+            shape-rendering: geometricPrecision;
+        }
     </style>
 </head>
 <body>
@@ -403,6 +414,10 @@
             {% block content %}{% endblock %}
         </div>
     </div>
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/1.13.7/i18n/zh.json"></script>
     
     {% block scripts %}{% endblock %}
 </body>

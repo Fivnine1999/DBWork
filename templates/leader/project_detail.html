@@ -150,7 +150,7 @@
         <div style="margin-bottom: 20px;">
             <p><strong>项目预算：</strong>¥{{ project.budget }}</p>
             <p><strong>已报销金额：</strong>¥{{ total_reimbursed }}</p>
-            <p><strong>报销进度：</strong>{{ "%.2f"|format(reimbursement_percentage) }}%</p>
+            <p><strong>预算使用率：</strong>{{ "%.2f"|format(reimbursement_percentage) }}%</p>
             <div style="background: #e9ecef; border-radius: 10px; height: 30px; overflow: hidden; margin-top: 10px;">
                 <div id="progress-bar" data-percentage="{{ reimbursement_percentage }}" style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
             </div>
