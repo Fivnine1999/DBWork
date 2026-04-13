@@ -8,7 +8,10 @@
     <div class="user-info">
         <span>欢迎，{{ session.real_name }}</span>
         <span class="status-badge status-{{ session.role }}">{{ session.role }}</span>
-        <a href="{{ url_for('logout') }}">退出登录</a>
+        <a href="{{ url_for('logout') }}">
+            <i class="iconfont icon-tuichu"></i>
+            <span>退出</span>
+        </a>
     </div>
 </div>
 {% endblock %}

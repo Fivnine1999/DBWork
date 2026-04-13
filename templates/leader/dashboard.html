@@ -8,7 +8,10 @@
     <div class="user-info">
         <span>欢迎，{{ session.real_name }}</span>
         <span class="status-badge status-{{ session.role }}">{{ session.role }}</span>
-        <a href="{{ url_for('logout') }}">退出登录</a>
+        <a href="{{ url_for('logout') }}">
+            <i class="iconfont icon-tuichu"></i>
+            <span>退出</span>
+        </a>
     </div>
 </div>
 {% endblock %}
@@ -16,148 +19,175 @@
 {% block content %}
 
 <div class="tabs">
-    <div class="tab active" onclick="showTab('projects')">我的项目</div>
-    <div class="tab" onclick="showTab('pending')">待审核</div>
+    <div class="tab active nav-item" onclick="showTab('projects')">
+        <i class="iconfont icon-xiangmu"></i>
+        <span class="text">我的项目</span>
+    </div>
+    <div class="tab nav-item" onclick="showTab('pending')">
+        <i class="iconfont icon-jiekuanshenhezhong1"></i>
+        <span class="text">待审核</span>
+    </div>
 </div>
 
 <div id="projects" class="tab-content active">
-    <h3 style="margin-bottom: 15px;">申报新项目</h3>
-    <form method="POST" action="{{ url_for('add_project') }}">
-        <div class="form-group">
-            <label>项目名称</label>
-            <input type="text" name="project_name" required>
+    <div style="background: white; border-radius: 8px; padding: 20px; margin-top: 20px;">
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 15px;">申报新项目</h3>
+            <form method="POST" action="{{ url_for('add_project') }}">
+                <div class="form-group">
+                    <label>项目名称</label>
+                    <input type="text" name="project_name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>项目简介</label>
+                    <textarea name="description" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>项目预算</label>
+                    <input type="number" name="budget" step="0.01" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">提交申报</button>
+            </form>
         </div>
         
-        <div class="form-group">
-            <label>项目简介</label>
-            <textarea name="description" rows="3" required></textarea>
-        </div>
-        
-        <div class="form-group">
-            <label>项目预算</label>
-            <input type="number" name="budget" step="0.01" required>
-        </div>
-        
-        <button type="submit" class="btn btn-primary">提交申报</button>
-    </form>
-</div>
-
-<table>
-    <thead>
-        <tr>
-            <th>项目名称</th>
-            <th>简介</th>
-            <th>预算</th>
-            <th>状态</th>
-            <th>申报日期</th>
-            <th>操作</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for project in projects %}
-        <tr>
-            <td>{{ project.project_name }}</td>
-            <td>{{ project.description }}</td>
-            <td>¥{{ project.budget }}</td>
-            <td><span class="status-badge status-{{ project.status }}">{{ project.status }}</span></td>
-            <td>{{ project.apply_date }}</td>
-            <td>
-                <a href="{{ url_for('project_detail', project_id=project.project_id) }}" class="btn btn-primary btn-small">进入项目</a>
-            </td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="6" style="text-align: center; color: #999;">暂无项目</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        <table style="background: white; border-radius: 8px; overflow: hidden; margin-top: 20px; width: 100%;">
+            <thead>
+                <tr style="background: #f8f9fa;">
+                    <th>项目名称</th>
+                    <th>简介</th>
+                    <th>预算</th>
+                    <th>状态</th>
+                    <th>申报日期</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in projects %}
+                <tr>
+                    <td>{{ project.project_name }}</td>
+                    <td>{{ project.description }}</td>
+                    <td>¥{{ project.budget }}</td>
+                    <td><span class="status-badge status-{{ project.status }}">{{ project.status }}</span></td>
+                    <td>{{ project.apply_date }}</td>
+                    <td>
+                        <a href="{{ url_for('project_detail', project_id=project.project_id) }}" class="btn btn-primary btn-small" style="padding: 6px 12px; font-size: 14px; width: auto; white-space: nowrap;">进入项目</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: #999;">暂无项目</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <div id="pending" class="tab-content">
-    <h2>待审核内容</h2>
-    
-    <h3 style="margin: 20px 0 10px 0;">待审核报销</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>报销单号</th>
-                <th>项目名称</th>
-                <th>申请人</th>
-                <th>金额</th>
-                <th>事由</th>
-                <th>申请日期</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for reimb in pending_reimbursements %}
-            <tr>
-                <td>{{ reimb.reimb_id }}</td>
-                <td>{{ reimb.project_name }}</td>
-                <td>{{ reimb.applicant_name }}</td>
-                <td>¥{{ reimb.amount }}</td>
-                <td>{{ reimb.reason }}</td>
-                <td>{{ reimb.apply_date }}</td>
-                <td>
-                    <form method="POST" action="{{ url_for('review_reimbursement', reimb_id=reimb.reimb_id) }}" style="display: inline;">
-                        <input type="hidden" name="action" value="approve">
-                        <button type="submit" class="btn btn-success btn-small">通过</button>
-                    </form>
-                    <form method="POST" action="{{ url_for('review_reimbursement', reimb_id=reimb.reimb_id) }}" style="display: inline;">
-                        <input type="hidden" name="action" value="reject">
-                        <button type="submit" class="btn btn-danger btn-small">驳回</button>
-                    </form>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="7" style="text-align: center; color: #999;">暂无待审核报销</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
-    <h3 style="margin: 20px 0 10px 0;">待审核成果</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>成果ID</th>
-                <th>项目名称</th>
-                <th>提交人</th>
-                <th>成果名称</th>
-                <th>类型</th>
-                <th>发表日期</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for achievement in pending_achievements %}
-            <tr>
-                <td>{{ achievement.achievement_id }}</td>
-                <td>{{ achievement.project_name }}</td>
-                <td>{{ achievement.submitter_name }}</td>
-                <td>{{ achievement.title }}</td>
-                <td>{{ achievement.type }}</td>
-                <td>{{ achievement.publish_date }}</td>
-                <td>
-                    <form method="POST" action="{{ url_for('review_achievement', achievement_id=achievement.achievement_id) }}" style="display: inline;">
-                        <input type="hidden" name="action" value="approve">
-                        <button type="submit" class="btn btn-success btn-small">通过</button>
-                    </form>
-                    <form method="POST" action="{{ url_for('review_achievement', achievement_id=achievement.achievement_id) }}" style="display: inline;">
-                        <input type="hidden" name="action" value="reject">
-                        <button type="submit" class="btn btn-danger btn-small">驳回</button>
-                    </form>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="7" style="text-align: center; color: #999;">暂无待审核成果</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div style="background: white; border-radius: 8px; padding: 20px; margin-top: 20px;">
+        <h2>待审核内容</h2>
+        
+        <h3 style="margin: 20px 0 10px 0;">待审核报销</h3>
+        <table style="background: white; border-radius: 8px; overflow: hidden; width: 100%;">
+            <thead>
+                <tr style="background: #f8f9fa;">
+                    <th>报销单号</th>
+                    <th>项目名称</th>
+                    <th>申请人</th>
+                    <th>金额</th>
+                    <th>事由</th>
+                    <th>申请日期</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reimb in pending_reimbursements %}
+                <tr>
+                    <td>{{ reimb.reimb_id }}</td>
+                    <td>{{ reimb.project_name }}</td>
+                    <td>{{ reimb.applicant_name }}</td>
+                    <td>¥{{ reimb.amount }}</td>
+                    <td>{{ reimb.reason }}</td>
+                    <td>{{ reimb.apply_date }}</td>
+                    <td style="white-space: nowrap;">
+                        <div style="display: inline-flex; gap: 5px;">
+                            <form method="POST" action="{{ url_for('review_reimbursement', reimb_id=reimb.reimb_id) }}" style="display: inline-block;">
+                                <input type="hidden" name="action" value="approve">
+                                <button type="submit" class="btn btn-success btn-small status-pass">
+                                    <i class="iconfont icon-tongguo"></i>
+                                    <span>通过</span>
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ url_for('review_reimbursement', reimb_id=reimb.reimb_id) }}" style="display: inline-block;">
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="btn btn-danger btn-small status-reject">
+                                    <i class="iconfont icon-jujue"></i>
+                                    <span>驳回</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; color: #999;">暂无待审核报销</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <h3 style="margin: 20px 0 10px 0;">待审核成果</h3>
+        <table style="background: white; border-radius: 8px; overflow: hidden; width: 100%;">
+            <thead>
+                <tr style="background: #f8f9fa;">
+                    <th>成果ID</th>
+                    <th>项目名称</th>
+                    <th>提交人</th>
+                    <th>成果名称</th>
+                    <th>类型</th>
+                    <th>发表日期</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for achievement in pending_achievements %}
+                <tr>
+                    <td>{{ achievement.achievement_id }}</td>
+                    <td>{{ achievement.project_name }}</td>
+                    <td>{{ achievement.submitter_name }}</td>
+                    <td>{{ achievement.title }}</td>
+                    <td>{{ achievement.type }}</td>
+                    <td>{{ achievement.publish_date }}</td>
+                    <td style="white-space: nowrap;">
+                        <div style="display: inline-flex; gap: 5px;">
+                            <form method="POST" action="{{ url_for('review_achievement', achievement_id=achievement.achievement_id) }}" style="display: inline-block;">
+                                <input type="hidden" name="action" value="approve">
+                                <button type="submit" class="btn btn-success btn-small status-pass">
+                                    <i class="iconfont icon-tongguo"></i>
+                                    <span>通过</span>
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ url_for('review_achievement', achievement_id=achievement.achievement_id) }}" style="display: inline-block;">
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="btn btn-danger btn-small status-reject">
+                                    <i class="iconfont icon-jujue"></i>
+                                    <span>驳回</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; color: #999;">暂无待审核成果</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
 

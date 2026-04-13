@@ -8,16 +8,28 @@
     <div class="user-info">
         <span>欢迎，{{ session.real_name }}</span>
         <span class="status-badge status-{{ session.role }}">{{ session.role }}</span>
-        <a href="{{ url_for('logout') }}">退出登录</a>
+        <a href="{{ url_for('logout') }}">
+            <i class="iconfont icon-tuichu"></i>
+            <span>退出</span>
+        </a>
     </div>
 </div>
 {% endblock %}
 
 {% block content %}
 <div class="tabs">
-    <div class="tab active" onclick="showTab('tasks')">我的任务</div>
-    <div class="tab" onclick="showTab('reimbursements')">报销申请</div>
-    <div class="tab" onclick="showTab('achievements')">我的成果</div>
+    <div class="tab active nav-item" onclick="showTab('tasks')">
+        <i class="iconfont icon-renwu"></i>
+        <span class="text">我的任务</span>
+    </div>
+    <div class="tab nav-item" onclick="showTab('reimbursements')">
+        <i class="iconfont icon-shiliangzhinengduixiang5"></i>
+        <span class="text">报销申请</span>
+    </div>
+    <div class="tab nav-item" onclick="showTab('achievements')">
+        <i class="iconfont icon-xiangmuchengguo"></i>
+        <span class="text">我的成果</span>
+    </div>
 </div>
 
 <div id="tasks" class="tab-content active">

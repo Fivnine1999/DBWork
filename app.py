@@ -521,6 +521,8 @@ from flask import Response
 
 from urllib.parse import quote
 
+from flask import jsonify
+
 def create_csv_response(data, headers, filename):
     output = io.StringIO()
     writer = csv.writer(output)
@@ -641,6 +643,85 @@ def export_achievements():
         ])
     
     return create_csv_response(data, headers, '成果数据')
+
+@app.route('/api/admin/trend-data')
+@login_required
+def get_admin_trend_data():
+    # 验证用户权限
+    if session.get('role') != '科研机构管理员':
+        return jsonify({'error': '无权访问'}), 403
+    
+    from datetime import datetime, timedelta
+    import calendar
+    
+    # 计算近7天的日期
+    dates = []
+    today = datetime.now()
+    for i in range(6, -1, -1):
+        date = today - timedelta(days=i)
+        dates.append(date.strftime('%m-%d'))
+    
+    # 初始化数据字典
+    project_data = {date: 0 for date in dates}
+    reimbursement_data = {date: 0 for date in dates}
+    achievement_data = {date: 0 for date in dates}
+    
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    
+    # 查询项目数据
+    start_date = (today - timedelta(days=6)).strftime('%Y-%m-%d')
+    end_date = today.strftime('%Y-%m-%d')
+    
+    # 项目数
+    cursor.execute('''
+        SELECT DATE(apply_date) as date, COUNT(*) as count 
+        FROM projects 
+        WHERE apply_date BETWEEN %s AND %s 
+        GROUP BY DATE(apply_date)
+    ''', (start_date, end_date))
+    project_results = cursor.fetchall()
+    for result in project_results:
+        date_str = result['date'].strftime('%m-%d')
+        if date_str in project_data:
+            project_data[date_str] = result['count']
+    
+    # 报销数
+    cursor.execute('''
+        SELECT DATE(apply_date) as date, COUNT(*) as count 
+        FROM reimbursements 
+        WHERE apply_date BETWEEN %s AND %s 
+        GROUP BY DATE(apply_date)
+    ''', (start_date, end_date))
+    reimbursement_results = cursor.fetchall()
+    for result in reimbursement_results:
+        date_str = result['date'].strftime('%m-%d')
+        if date_str in reimbursement_data:
+            reimbursement_data[date_str] = result['count']
+    
+    # 成果数
+    cursor.execute('''
+        SELECT DATE(publish_date) as date, COUNT(*) as count 
+        FROM achievements 
+        WHERE publish_date BETWEEN %s AND %s 
+        GROUP BY DATE(publish_date)
+    ''', (start_date, end_date))
+    achievement_results = cursor.fetchall()
+    for result in achievement_results:
+        date_str = result['date'].strftime('%m-%d')
+        if date_str in achievement_data:
+            achievement_data[date_str] = result['count']
+    
+    # 转换为列表
+    project_list = [project_data[date] for date in dates]
+    reimbursement_list = [reimbursement_data[date] for date in dates]
+    achievement_list = [achievement_data[date] for date in dates]
+    
+    return jsonify({
+        'dates': dates,
+        'projects': project_list,
+        'reimbursements': reimbursement_list,
+        'achievements': achievement_list
+    })
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
