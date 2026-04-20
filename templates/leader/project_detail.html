@@ -272,14 +272,22 @@
                 <td><span class="status-badge status-{{ reimb.status }}">{{ reimb.status }}</span></td>
                 <td>
                     {% if reimb.status == '待审核' and project.status == '执行中' %}
-                    <form method="POST" action="{{ url_for('review_reimbursement', reimb_id=reimb.reimb_id) }}" style="display: inline;">
-                        <input type="hidden" name="action" value="approve">
-                        <button type="submit" class="btn btn-success btn-small">通过</button>
-                    </form>
-                    <form method="POST" action="{{ url_for('review_reimbursement', reimb_id=reimb.reimb_id) }}" style="display: inline;">
-                        <input type="hidden" name="action" value="reject">
-                        <button type="submit" class="btn btn-danger btn-small">驳回</button>
-                    </form>
+                    <div style="display: inline-flex; gap: 5px;">
+                        <form method="POST" action="{{ url_for('review_reimbursement', reimb_id=reimb.reimb_id) }}" style="display: inline-block;">
+                            <input type="hidden" name="action" value="approve">
+                            <button type="submit" class="btn btn-success btn-small status-pass">
+                                <i class="iconfont icon-tongguo"></i>
+                                <span>通过</span>
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('review_reimbursement', reimb_id=reimb.reimb_id) }}" style="display: inline-block;">
+                            <input type="hidden" name="action" value="reject">
+                            <button type="submit" class="btn btn-danger btn-small status-reject">
+                                <i class="iconfont icon-jujue"></i>
+                                <span>驳回</span>
+                            </button>
+                        </form>
+                    </div>
                     {% endif %}
                 </td>
             </tr>
@@ -316,14 +324,22 @@
                 <td><span class="status-badge status-{{ achievement.status }}">{{ achievement.status }}</span></td>
                 <td>
                     {% if achievement.status == '待审核' and project.status == '执行中' %}
-                    <form method="POST" action="{{ url_for('review_achievement', achievement_id=achievement.achievement_id) }}" style="display: inline;">
-                        <input type="hidden" name="action" value="approve">
-                        <button type="submit" class="btn btn-success btn-small">通过</button>
-                    </form>
-                    <form method="POST" action="{{ url_for('review_achievement', achievement_id=achievement.achievement_id) }}" style="display: inline;">
-                        <input type="hidden" name="action" value="reject">
-                        <button type="submit" class="btn btn-danger btn-small">驳回</button>
-                    </form>
+                    <div style="display: inline-flex; gap: 5px;">
+                        <form method="POST" action="{{ url_for('review_achievement', achievement_id=achievement.achievement_id) }}" style="display: inline-block;">
+                            <input type="hidden" name="action" value="approve">
+                            <button type="submit" class="btn btn-success btn-small status-pass">
+                                <i class="iconfont icon-tongguo"></i>
+                                <span>通过</span>
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('review_achievement', achievement_id=achievement.achievement_id) }}" style="display: inline-block;">
+                            <input type="hidden" name="action" value="reject">
+                            <button type="submit" class="btn btn-danger btn-small status-reject">
+                                <i class="iconfont icon-jujue"></i>
+                                <span>驳回</span>
+                            </button>
+                        </form>
+                    </div>
                     {% endif %}
                 </td>
             </tr>

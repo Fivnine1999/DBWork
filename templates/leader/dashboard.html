@@ -59,7 +59,7 @@
                     <th>项目名称</th>
                     <th>简介</th>
                     <th>预算</th>
-                    <th>状态</th>
+                    <th style="width: 100px;">状态</th>
                     <th>申报日期</th>
                     <th>操作</th>
                 </tr>
@@ -91,7 +91,7 @@
         <h2>待审核内容</h2>
         
         <h3 style="margin: 20px 0 10px 0;">待审核报销</h3>
-        <table style="background: white; border-radius: 8px; overflow: hidden; width: 100%;">
+        <table id="pendingReimbursementTable" style="background: white; border-radius: 8px; overflow: hidden; width: 100%;">
             <thead>
                 <tr style="background: #f8f9fa;">
                     <th>报销单号</th>
@@ -140,15 +140,15 @@
         </table>
         
         <h3 style="margin: 20px 0 10px 0;">待审核成果</h3>
-        <table style="background: white; border-radius: 8px; overflow: hidden; width: 100%;">
+        <table id="pendingAchievementTable" style="background: white; border-radius: 8px; overflow: hidden; width: 100%;">
             <thead>
                 <tr style="background: #f8f9fa;">
                     <th>成果ID</th>
                     <th>项目名称</th>
-                    <th>提交人</th>
+                    <th style="width: 60px;">提交人</th>
                     <th>成果名称</th>
                     <th>类型</th>
-                    <th>发表日期</th>
+                    <th style="width: 80px;">发表日期</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -199,6 +199,49 @@ function showTab(tabId) {
     
     event.target.classList.add('active');
     document.getElementById(tabId).classList.add('active');
+    
+    // 初始化表格
+    if (tabId === 'pending') {
+        initDataTables();
+    }
 }
+
+function initDataTables() {
+    // 初始化待审核报销表格
+    if (!$.fn.DataTable.isDataTable('#pendingReimbursementTable')) {
+        $('#pendingReimbursementTable').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+            "order": [[5, "desc"]] // 按申请日期降序
+        });
+    }
+    
+    // 初始化待审核成果表格
+    if (!$.fn.DataTable.isDataTable('#pendingAchievementTable')) {
+        $('#pendingAchievementTable').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+            "order": [[5, "desc"]] // 按发表日期降序
+        });
+    }
+}
+
+// 页面加载完成后初始化表格
+$(document).ready(function() {
+    // 检查当前是否显示待审核标签
+    if (document.querySelector('#pending.active')) {
+        initDataTables();
+    }
+});
 </script>
 {% endblock %}

@@ -90,15 +90,7 @@
                 <th>已报销</th>
                 <th>任务数</th>
                 <th>成果数</th>
-                <th style="width: 120px;">
-                    <select name="status" onclick="event.stopPropagation();" onchange="this.form.submit()" style="border: none; background: transparent; cursor: pointer; outline: none; font-weight: bold;">
-                        <option value="">状态</option>
-                        <option value="申报中" {% if request.args.get('status') == '申报中' %}selected{% endif %}>申报中</option>
-                        <option value="已立项" {% if request.args.get('status') == '已立项' %}selected{% endif %}>已立项</option>
-                        <option value="已结题" {% if request.args.get('status') == '已结题' %}selected{% endif %}>已结题</option>
-                        <option value="已驳回" {% if request.args.get('status') == '已驳回' %}selected{% endif %}>已驳回</option>
-                    </select>
-                </th>
+                <th style="width: 120px;">状态</th>
                 <th>申报日期</th>
                 <th style="width: 150px; white-space: nowrap; text-align: center;">操作</th>
             </tr>
@@ -128,7 +120,7 @@
                             <input type="hidden" name="action" value="reject">
                             <button type="submit" class="btn btn-danger btn-small status-reject">
                                 <i class="iconfont icon-jujue"></i>
-                                <span>拒绝</span>
+                                <span>驳回</span>
                             </button>
                         </form>
                     </div>
@@ -178,7 +170,6 @@
                 <select name="role" required>
                     <option value="科研人员">科研人员</option>
                     <option value="项目负责人">项目负责人</option>
-                    <option value="科研机构管理员">科研机构管理员</option>
                 </select>
             </div>
             
@@ -202,7 +193,6 @@
                         <option value="">角色</option>
                         <option value="科研人员" {% if request.args.get('role') == '科研人员' %}selected{% endif %}>科研人员</option>
                         <option value="项目负责人" {% if request.args.get('role') == '项目负责人' %}selected{% endif %}>项目负责人</option>
-                        <option value="科研机构管理员" {% if request.args.get('role') == '科研机构管理员' %}selected{% endif %}>科研机构管理员</option>
                     </select>
                 </th>
                 <th>部门</th>
@@ -222,7 +212,6 @@
                         <select name="role" onchange="this.form.submit()" style="width: 100%; max-width: 130px; padding: 4px; border-radius: 4px; border: 1px solid #ccc;">
                             <option value="科研人员" {% if user.role == '科研人员' %}selected{% endif %}>科研人员</option>
                             <option value="项目负责人" {% if user.role == '项目负责人' %}selected{% endif %}>项目负责人</option>
-                            <option value="科研机构管理员" {% if user.role == '科研机构管理员' %}selected{% endif %}>科研机构管理员</option>
                         </select>
                     </form>
                 </td>
@@ -266,14 +255,7 @@
                 <th>金额</th>
                 <th>事由</th>
                 <th>申请日期</th>
-                <th style="width: 120px;">
-                    <select name="status" onclick="event.stopPropagation();" onchange="this.form.submit()" style="border: none; background: transparent; cursor: pointer; outline: none; font-weight: bold;">
-                        <option value="">状态</option>
-                        <option value="待审核" {% if request.args.get('status') == '待审核' %}selected{% endif %}>待审核</option>
-                        <option value="已通过" {% if request.args.get('status') == '已通过' %}selected{% endif %}>已通过</option>
-                        <option value="已驳回" {% if request.args.get('status') == '已驳回' %}selected{% endif %}>已驳回</option>
-                    </select>
-                </th>
+                <th style="width: 120px;">状态</th>
                 <th style="width: 150px; white-space: nowrap; text-align: center;">操作</th>
             </tr>
         </thead>
@@ -301,7 +283,7 @@
                             <input type="hidden" name="action" value="reject">
                             <button type="submit" class="btn btn-danger btn-small status-reject">
                                 <i class="iconfont icon-jujue"></i>
-                                <span>拒绝</span>
+                                <span>驳回</span>
                             </button>
                         </form>
                     </div>
@@ -337,14 +319,7 @@
                 <th>成果名称</th>
                 <th>类型</th>
                 <th>发表日期</th>
-                <th style="width: 120px;">
-                    <select name="status" onclick="event.stopPropagation();" onchange="this.form.submit()" style="border: none; background: transparent; cursor: pointer; outline: none; font-weight: bold;">
-                        <option value="">状态</option>
-                        <option value="待审核" {% if request.args.get('status') == '待审核' %}selected{% endif %}>待审核</option>
-                        <option value="已通过" {% if request.args.get('status') == '已通过' %}selected{% endif %}>已通过</option>
-                        <option value="已驳回" {% if request.args.get('status') == '已驳回' %}selected{% endif %}>已驳回</option>
-                    </select>
-                </th>
+                <th style="width: 120px;">状态</th>
                 <th style="width: 150px; white-space: nowrap; text-align: center;">操作</th>
             </tr>
         </thead>
@@ -372,7 +347,7 @@
                             <input type="hidden" name="action" value="reject">
                             <button type="submit" class="btn btn-danger btn-small status-reject">
                                 <i class="iconfont icon-jujue"></i>
-                                <span>拒绝</span>
+                                <span>驳回</span>
                             </button>
                         </form>
                     </div>
